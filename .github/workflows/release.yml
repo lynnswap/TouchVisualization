@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag of the prepared Draft Release
+        required: true
+        type: string
+      commit:
+        description: Approved full commit SHA to test and release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Verify the release target
+    runs-on: ubuntu-24.04
+    permissions:
+      # Draft releases are visible only to tokens with push access.
+      contents: write
+    outputs:
+      commit: ${{ steps.release.outputs.commit }}
+      release_id: ${{ steps.release.outputs.release_id }}
+      draft: ${{ steps.release.outputs.draft }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: release
+        name: Check Draft Release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          TARGET_SHA: ${{ inputs.commit }}
+        run: python3 .github/scripts/release.py prepare
+
+  checks:
+    name: Validate the release commit
+    needs: prepare
+    if: needs.prepare.outputs.draft == 'true'
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.prepare.outputs.commit }}
+
+  publish:
+    name: Publish the validated Draft Release
+    needs: [prepare, checks]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Publish without replacing the release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          TARGET_SHA: ${{ needs.prepare.outputs.commit }}
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+        run: python3 .github/scripts/release.py publish

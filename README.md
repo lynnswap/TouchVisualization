@@ -17,7 +17,7 @@ func setTouchVisualizationEnabled(_ enabled: Bool) {
 }
 ```
 
-Visualization starts disabled. Your app controls when to enable it and whether to persist the setting. See the DocC documentation for the API contract and integration details.
+Visualization starts disabled. Your app controls when to enable it and whether to persist the setting. See the [API documentation](https://lynnswap.github.io/TouchVisualization/documentation/touchvisualization/) for the API contract and integration details.
 
 ## License
 
