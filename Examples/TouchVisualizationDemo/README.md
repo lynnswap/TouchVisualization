@@ -8,4 +8,4 @@ Use **Appearance** to change the indicator color, outline width, and diameter. T
 
 The toggle is available in both Debug and Release configurations.
 
-To run the package's Swift Testing tests, open `Package.swift` at the repository root, select the **TouchVisualization** scheme and an iOS Simulator, then choose **Product → Test**. Use the same scheme with the Debug configuration and **Product → Build Documentation** to build DocC.
+To run the package's Swift Testing tests, select the **TouchVisualizationTests** scheme and an iOS Simulator in the workspace, then choose **Product → Test**. Select **TouchVisualization** with the Debug configuration and **Product → Build Documentation** to build DocC.

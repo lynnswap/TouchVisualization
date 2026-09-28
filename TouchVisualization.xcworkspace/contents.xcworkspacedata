@@ -4,4 +4,7 @@
    <FileRef
       location = "group:Examples/TouchVisualizationDemo/TouchVisualizationDemo.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:">
+   </FileRef>
 </Workspace>

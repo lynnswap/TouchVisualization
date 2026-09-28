@@ -1,0 +1,5 @@
+self-hosted-runner:
+  # Official GitHub-hosted preview label, not yet in actionlint's built-in catalog.
+  # https://github.blog/changelog/2026-07-16-xcode-27-runner-image-now-in-public-preview/
+  labels:
+    - xcode-27
