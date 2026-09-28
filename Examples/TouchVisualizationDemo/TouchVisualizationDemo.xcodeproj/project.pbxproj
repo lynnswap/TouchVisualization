@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 110;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -25,9 +25,11 @@
 /* Begin PBXFrameworksBuildPhase section */
 		682CDB0F306A726D00902EE1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				686CF7F1306A7336001B78F4 /* TouchVisualization in Frameworks */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -60,6 +62,8 @@
 				682CDB10306A726D00902EE1 /* Resources */,
 			);
 			buildRules = (
+			);
+			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
 				682CDB14306A726D00902EE1 /* TouchVisualizationDemo */,
@@ -95,9 +99,8 @@
 				Base,
 			);
 			mainGroup = 682CDB09306A726D00902EE1;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				686CF7EF306A7336001B78F4 /* XCLocalSwiftPackageReference "../../../TouchVisualization" */,
+				686CF7EF306A7336001B78F4 /* XCLocalSwiftPackageReference "../.." */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 682CDB13306A726D00902EE1 /* Products */;
@@ -112,21 +115,25 @@
 /* Begin PBXResourcesBuildPhase section */
 		682CDB10306A726D00902EE1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		682CDB0E306A726D00902EE1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		682CDB1B306A726E00902EE1 /* Debug configuration for PBXProject "TouchVisualizationDemo" */ = {
+		682CDB1B306A726E00902EE1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -187,7 +194,7 @@
 			};
 			name = Debug;
 		};
-		682CDB1C306A726E00902EE1 /* Release configuration for PBXProject "TouchVisualizationDemo" */ = {
+		682CDB1C306A726E00902EE1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -240,7 +247,7 @@
 			};
 			name = Release;
 		};
-		682CDB1E306A726E00902EE1 /* Debug configuration for PBXNativeTarget "TouchVisualizationDemo" */ = {
+		682CDB1E306A726E00902EE1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -288,7 +295,7 @@
 			};
 			name = Debug;
 		};
-		682CDB1F306A726E00902EE1 /* Release configuration for PBXNativeTarget "TouchVisualizationDemo" */ = {
+		682CDB1F306A726E00902EE1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -342,23 +349,25 @@
 		682CDB0D306A726D00902EE1 /* Build configuration list for PBXProject "TouchVisualizationDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				682CDB1B306A726E00902EE1 /* Debug configuration for PBXProject "TouchVisualizationDemo" */,
-				682CDB1C306A726E00902EE1 /* Release configuration for PBXProject "TouchVisualizationDemo" */,
+				682CDB1B306A726E00902EE1 /* Debug */,
+				682CDB1C306A726E00902EE1 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		682CDB1D306A726E00902EE1 /* Build configuration list for PBXNativeTarget "TouchVisualizationDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				682CDB1E306A726E00902EE1 /* Debug configuration for PBXNativeTarget "TouchVisualizationDemo" */,
-				682CDB1F306A726E00902EE1 /* Release configuration for PBXNativeTarget "TouchVisualizationDemo" */,
+				682CDB1E306A726E00902EE1 /* Debug */,
+				682CDB1F306A726E00902EE1 /* Release */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		686CF7EF306A7336001B78F4 /* XCLocalSwiftPackageReference "../../../TouchVisualization" */ = {
+		686CF7EF306A7336001B78F4 /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../..;
 		};
@@ -372,5 +381,4 @@
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 682CDB0A306A726D00902EE1 /* Project object */;
-	validationLevel = 1;
 }
