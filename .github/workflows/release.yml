@@ -23,6 +23,9 @@ jobs:
   prepare:
     name: Verify the release target
     runs-on: ubuntu-24.04
+    permissions:
+      # Draft releases are visible only to tokens with push access.
+      contents: write
     outputs:
       commit: ${{ steps.release.outputs.commit }}
       release_id: ${{ steps.release.outputs.release_id }}
