@@ -360,7 +360,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		686CF7EF306A7336001B78F4 /* XCLocalSwiftPackageReference "../../../TouchVisualization" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../TouchVisualization;
+			relativePath = ../..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
