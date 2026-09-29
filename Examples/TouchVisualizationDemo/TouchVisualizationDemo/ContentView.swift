@@ -5,22 +5,18 @@ import SwiftUI
 import TouchVisualization
 
 struct ContentView: View {
-    @Binding var showsTouches: Bool
+    @Bindable var visualizer: TouchVisualizer
     @State private var tapCount = 0
     @State private var progress = 0.5
     @State private var message = ""
     @State private var presentsSheet = false
-    @State private var configuration = TouchVisualizer.shared.configuration
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    Toggle("Show touches", isOn: $showsTouches)
+                    Toggle("Show touches", isOn: $visualizer.isEnabled)
                         .accessibilityIdentifier("showsTouches")
-                        .onChange(of: showsTouches) {
-                            TouchVisualizer.shared.isEnabled = showsTouches
-                        }
                 } footer: {
                     Text("Applies to the entire app. Your choice is saved between launches.")
                 }
@@ -29,29 +25,31 @@ struct ContentView: View {
                     ColorPicker(
                         "Color",
                         selection: Binding(
-                            get: { Color(uiColor: configuration.color) },
-                            set: { configuration.color = UIColor($0) }
+                            get: { Color(uiColor: visualizer.configuration.strokeColor) },
+                            set: { color in
+                                var configuration = visualizer.configuration
+                                configuration.strokeColor = UIColor(color)
+                                configuration.fillColor = UIColor(color.opacity(0.5))
+                                visualizer.configuration = configuration
+                            }
                         )
                     )
                     Stepper(
-                        "Diameter: \(Int(configuration.diameter)) pt",
-                        value: $configuration.diameter,
+                        "Diameter: \(Int(visualizer.configuration.diameter)) pt",
+                        value: $visualizer.configuration.diameter,
                         in: 16...96,
                         step: 4
                     )
                     .accessibilityIdentifier("diameter")
                     Stepper(
-                        "Outline width: \(Int(configuration.strokeWidth)) pt",
-                        value: $configuration.strokeWidth,
+                        "Outline width: \(Int(visualizer.configuration.strokeWidth)) pt",
+                        value: $visualizer.configuration.strokeWidth,
                         in: 0...8
                     )
                     .accessibilityIdentifier("strokeWidth")
                     Button("Reset appearance") {
-                        configuration = .init()
+                        visualizer.configuration = .init()
                     }
-                }
-                .onChange(of: configuration) {
-                    TouchVisualizer.shared.configuration = configuration
                 }
 
                 Section("Try the controls") {
@@ -119,5 +117,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(showsTouches: .constant(false))
+    ContentView(visualizer: .shared)
 }

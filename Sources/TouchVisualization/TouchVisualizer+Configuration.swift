@@ -6,11 +6,16 @@ import UIKit
 extension TouchVisualizer {
     /// The appearance of touch indicators throughout the application.
     public struct Configuration: Equatable {
-        /// The indicator color. Defaults to system blue.
+        /// The outline color. Defaults to system blue.
         ///
-        /// The outline uses this color, and the fill uses half its opacity.
         /// Dynamic colors resolve using the displaying window's traits.
-        public var color: UIColor
+        public var strokeColor: UIColor
+
+        /// The fill color. Defaults to system blue at 50% opacity.
+        ///
+        /// Independent of `strokeColor`, including its opacity. Dynamic colors
+        /// resolve using the displaying window's traits.
+        public var fillColor: UIColor
 
         /// The outline width in points. Defaults to 2.
         public var strokeWidth: CGFloat
@@ -20,11 +25,13 @@ extension TouchVisualizer {
 
         /// Creates a configuration with the specified appearance.
         public init(
-            color: UIColor = .systemBlue,
+            strokeColor: UIColor = .systemBlue,
+            fillColor: UIColor = .systemBlue.withAlphaComponent(0.5),
             strokeWidth: CGFloat = 2,
             diameter: CGFloat = 44
         ) {
-            self.color = color
+            self.strokeColor = strokeColor
+            self.fillColor = fillColor
             self.strokeWidth = strokeWidth
             self.diameter = diameter
         }
