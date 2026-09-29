@@ -44,7 +44,13 @@ final class TouchOverlayView: UIView {
         indicators[identifier] = indicator
     }
 
-    func finish(_ identifier: ObjectIdentifier) {
+    func finishTouches(except activeTouches: Set<ObjectIdentifier>) {
+        for identifier in Set(indicators.keys).subtracting(activeTouches) {
+            finish(identifier)
+        }
+    }
+
+    private func finish(_ identifier: ObjectIdentifier) {
         guard let indicator = indicators.removeValue(forKey: identifier) else { return }
 
         UIView.animate(
