@@ -11,13 +11,10 @@ Add [TouchVisualization](https://github.com/lynnswap/TouchVisualization) as a Sw
 ```swift
 import TouchVisualization
 
-@MainActor
-func setTouchVisualizationEnabled(_ enabled: Bool) {
-    TouchVisualizer.shared.isEnabled = enabled
-}
+TouchVisualizer.shared.isEnabled = true
 ```
 
-Visualization starts disabled. Your app controls when to enable it and whether to persist the setting. See the [API documentation](https://lynnswap.github.io/TouchVisualization/documentation/touchvisualization/) for the API contract and integration details.
+Visualization starts disabled. Set `isEnabled` to `false` to remove all indicators. See the [API documentation](https://lynnswap.github.io/TouchVisualization/documentation/touchvisualization/) for appearance customization and behavior.
 
 ## License
 

@@ -1,13 +1,15 @@
 // Copyright (c) 2026 Kazuki Nakashima
 // SPDX-License-Identifier: MIT
 
+import Observation
 import UIKit
 
 /// Controls touch indicators across every window in the application.
 ///
-/// Configure the shared instance on the main actor. TouchVisualization does not
-/// persist this setting or restrict it to a particular build configuration.
+/// Configure the shared instance on the main actor. Changes to its settings
+/// are observable. Settings are not persisted.
 @MainActor
+@Observable
 public final class TouchVisualizer {
     /// The application's touch visualizer.
     public static let shared = TouchVisualizer()

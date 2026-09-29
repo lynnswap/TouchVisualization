@@ -70,8 +70,7 @@ final class TouchOverlayView: UIView {
         indicator.bounds.size = CGSize(width: configuration.diameter, height: configuration.diameter)
         indicator.layer.cornerRadius = configuration.diameter / 2
         indicator.layer.borderWidth = configuration.strokeWidth
-        let color = configuration.color.resolvedColor(with: traitCollection)
-        indicator.layer.borderColor = color.cgColor
-        indicator.backgroundColor = color.withAlphaComponent(color.cgColor.alpha * 0.5)
+        indicator.layer.borderColor = configuration.strokeColor.resolvedColor(with: traitCollection).cgColor
+        indicator.backgroundColor = configuration.fillColor.resolvedColor(with: traitCollection)
     }
 }
