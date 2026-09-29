@@ -37,7 +37,9 @@ Dynamic colors resolve using the displaying window's traits and update when its 
 
 ### Event handling
 
-When first enabled, the package exchanges the implementation of `UIWindow.sendEvent(_:)` to observe touch events. It always calls the original implementation. Disabling visualization leaves the hook installed to preserve other libraries' hook chains. Custom window subclasses must call `super.sendEvent(_:)` for their touches to appear.
+When first enabled, the package exchanges the implementation of `UIWindow.sendEvent(_:)` to observe touch events before dispatching them to the app. It always calls the original implementation. Disabling visualization leaves the hook installed to preserve other libraries' hook chains. Custom window subclasses must call `super.sendEvent(_:)` for their touches to appear.
+
+Each touch event updates that window's indicators to match its current touches. If a touch's ending was missed, its indicator fades out when the next touch event reaches the same window. Stationary touches remain visible without a time limit.
 
 ## Topics
 

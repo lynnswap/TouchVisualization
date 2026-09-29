@@ -52,21 +52,24 @@ public final class TouchVisualizer {
     }
 
     func receive(_ event: UIEvent, in window: UIWindow) {
-        guard isEnabled, let touches = event.touches(for: window) else { return }
+        guard isEnabled, event.type == .touches else { return }
 
-        for touch in touches where touch.type != .stylus {
+        var activeTouches: Set<ObjectIdentifier> = []
+        for touch in event.touches(for: window) ?? [] where touch.type != .stylus {
             let identifier = ObjectIdentifier(touch)
             switch touch.phase {
             case .began, .moved, .stationary:
+                activeTouches.insert(identifier)
                 let overlay = overlay(in: window)
                 window.bringSubviewToFront(overlay)
                 overlay.show(identifier, at: touch.location(in: window))
-            case .ended, .cancelled:
-                overlays.object(forKey: window)?.finish(identifier)
             default:
                 break
             }
         }
+
+        // Reconcile the full window touch set so a missed ending cannot leave a stale indicator.
+        overlays.object(forKey: window)?.finishTouches(except: activeTouches)
     }
 
     private func overlay(in window: UIWindow) -> TouchOverlayView {

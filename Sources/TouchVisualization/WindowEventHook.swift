@@ -28,7 +28,8 @@ enum WindowEventHook {
 
 extension UIWindow {
     @objc dynamic fileprivate func touchVisualization_sendEvent(_ event: UIEvent) {
-        touchVisualization_sendEvent(event)
+        // Observe the event before dispatch invokes application code.
         TouchVisualizer.shared.receive(event, in: self)
+        touchVisualization_sendEvent(event)
     }
 }

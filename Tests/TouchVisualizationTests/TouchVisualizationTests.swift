@@ -7,6 +7,7 @@ import Testing
 import UIKit
 @testable import TouchVisualization
 
+@Suite(.serialized)
 @MainActor
 struct TouchVisualizationTests {
     @Test
@@ -145,6 +146,90 @@ struct TouchVisualizationTests {
         #expect(indicator.backgroundColor == expectedFillColor)
     }
 
+    @Test(arguments: [UITouch.Phase.ended, .cancelled])
+    func endingATouchFadesItsIndicator(phase: UITouch.Phase) throws {
+        try withEnabledVisualizer { visualizer in
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            let touch = TestTouch()
+            let event = TestEvent(touches: [window: [touch]])
+            visualizer.receive(event, in: window)
+            let overlay = try #require(window.subviews.first as? TouchOverlayView)
+            let indicator = try #require(overlay.subviews.first)
+
+            touch.testPhase = phase
+            visualizer.receive(event, in: window)
+
+            #expect(indicator.alpha == 0)
+        }
+    }
+
+    @Test
+    func nextEventRemovesMissingTouchesAndPreservesStationaryTouches() throws {
+        try withEnabledVisualizer { visualizer in
+            let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            let missingTouch = TestTouch()
+            let heldTouch = TestTouch()
+            heldTouch.position = CGPoint(x: 200, y: 240)
+            let event = TestEvent(touches: [window: [missingTouch, heldTouch]])
+            visualizer.receive(event, in: window)
+            let overlay = try #require(window.subviews.first as? TouchOverlayView)
+            let missingIndicator = try #require(overlay.subviews.first { $0.center == missingTouch.position })
+            let heldIndicator = try #require(overlay.subviews.first { $0.center == heldTouch.position })
+
+            // The next event no longer contains the first touch, without delivering its ending.
+            heldTouch.testPhase = .stationary
+            let newTouch = TestTouch()
+            newTouch.position = CGPoint(x: 100, y: 180)
+            event.windowTouches[window] = [heldTouch, newTouch]
+            visualizer.receive(event, in: window)
+
+            #expect(missingIndicator.alpha == 0)
+            #expect(heldIndicator.alpha == 1)
+            #expect(overlay.subviews.filter { $0.alpha == 1 }.count == 2)
+
+            visualizer.receive(event, in: window)
+            #expect(heldIndicator.alpha == 1)
+            #expect(overlay.subviews.filter { $0.alpha == 1 }.count == 2)
+        }
+    }
+
+    @Test
+    func emptyTouchSetClearsOnlyItsWindowAndOtherEventTypesDoNotClearTouches() throws {
+        try withEnabledVisualizer { visualizer in
+            let firstWindow = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            let secondWindow = UIWindow(frame: firstWindow.frame)
+            let event = TestEvent(touches: [firstWindow: [TestTouch()], secondWindow: [TestTouch()]])
+            visualizer.receive(event, in: firstWindow)
+            visualizer.receive(event, in: secondWindow)
+            let firstOverlay = try #require(firstWindow.subviews.first as? TouchOverlayView)
+            let secondOverlay = try #require(secondWindow.subviews.first as? TouchOverlayView)
+            let firstIndicator = try #require(firstOverlay.subviews.first)
+            let secondIndicator = try #require(secondOverlay.subviews.first)
+
+            event.windowTouches = [:]
+            event.testType = .motion
+            visualizer.receive(event, in: firstWindow)
+            #expect(firstIndicator.alpha == 1)
+            #expect(secondIndicator.alpha == 1)
+
+            event.testType = .touches
+            visualizer.receive(event, in: firstWindow)
+            #expect(firstIndicator.alpha == 0)
+            #expect(secondIndicator.alpha == 1)
+        }
+    }
+
+    private func withEnabledVisualizer(_ body: (TouchVisualizer) throws -> Void) rethrows {
+        let visualizer = TouchVisualizer.shared
+        let wasEnabled = visualizer.isEnabled
+        visualizer.isEnabled = true
+        defer {
+            visualizer.isEnabled = false
+            visualizer.isEnabled = wasEnabled
+        }
+        try body(visualizer)
+    }
+
     @Test
     func indicatorsDoNotInterceptTouches() {
         let overlay = TouchOverlayView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
@@ -153,5 +238,35 @@ struct TouchVisualizationTests {
 
         #expect(overlay.hitTest(position, with: nil) == nil)
         #expect(overlay.accessibilityElementsHidden)
+    }
+}
+
+@MainActor
+private final class TestTouch: UITouch {
+    var testPhase: UITouch.Phase = .began
+    var position = CGPoint(x: 40, y: 60)
+
+    override var phase: UITouch.Phase { testPhase }
+    override var type: UITouch.TouchType { .direct }
+
+    override func location(in view: UIView?) -> CGPoint {
+        position
+    }
+}
+
+@MainActor
+private final class TestEvent: UIEvent {
+    var testType: UIEvent.EventType = .touches
+    var windowTouches: [UIWindow: Set<UITouch>]
+
+    init(touches: [UIWindow: Set<UITouch>]) {
+        windowTouches = touches
+        super.init()
+    }
+
+    override var type: UIEvent.EventType { testType }
+
+    override func touches(for window: UIWindow) -> Set<UITouch>? {
+        windowTouches[window]
     }
 }
