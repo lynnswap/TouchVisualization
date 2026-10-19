@@ -55,17 +55,31 @@ jobs:
       - name: Create an iOS Simulator
         run: python3 .github/scripts/create-simulator.py
 
-      - name: Boot the Simulator
-        run: xcrun simctl bootstatus "$SIMULATOR_UDID" -b
+      - name: Start the Simulator
+        run: xcrun simctl boot "$SIMULATOR_UDID"
+
+      - name: Build package tests
+        run: |
+          set -e -o pipefail
+          xcodebuild build-for-testing \
+            -workspace TouchVisualization.xcworkspace \
+            -scheme TouchVisualizationTests \
+            -testPlan TouchVisualizationTests \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee "$RUNNER_TEMP/build.log"
 
       - name: Run package tests
         run: |
-          set -o pipefail
-          xcodebuild test \
+          set -e -o pipefail
+          xcrun simctl bootstatus "$SIMULATOR_UDID" -b
+          xcodebuild test-without-building \
             -workspace TouchVisualization.xcworkspace \
             -scheme TouchVisualizationTests \
             -testPlan TouchVisualizationTests \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -parallel-testing-enabled NO \
             -collect-test-diagnostics never \
             -resultBundlePath "$RUNNER_TEMP/tests.xcresult" \
@@ -89,6 +103,7 @@ jobs:
         with:
           name: tests-${{ matrix.runner }}-${{ github.run_attempt }}
           path: |
+            ${{ runner.temp }}/build.log
             ${{ runner.temp }}/tests.log
             ${{ runner.temp }}/tests.xcresult
           retention-days: 7
