@@ -65,7 +65,7 @@ jobs:
             -workspace TouchVisualization.xcworkspace \
             -scheme TouchVisualizationTests \
             -testPlan TouchVisualizationTests \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             | tee "$RUNNER_TEMP/build.log"
