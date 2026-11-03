@@ -1,6 +1,6 @@
 # Releasing
 
-Prepare a Draft Release with the approved version, title, notes, and full commit SHA. The **Release** workflow tests that commit using the same CI as pull requests, then publishes the same Draft Release. Failed checks leave it as a draft. The workflow preserves its title, notes, and prerelease status.
+Prepare a Draft Release with the approved version, title, notes, and full commit SHA. The **Release** workflow creates the approved tag first, tests that commit using the same CI as pull requests, then publishes the same Draft Release. The tag is available during validation. Failed checks leave the tag in place and the release as a draft. The workflow preserves its title, notes, and prerelease status.
 
 After fetching `main`, choose the version and confirm the commit and notes before running these commands:
 
@@ -25,7 +25,7 @@ gh workflow run release.yml \
 
 Replace the example version and notes path with the approved values. Add `--prerelease` when creating a prerelease draft. To use the Actions UI instead, run **Release** from `main` and enter the draft's tag and approved commit SHA.
 
-The workflow checks the release target again before publishing. An existing tag must point to the tested commit. A rerun of an already published release with the same commit performs no publication. If a check fails, fix the issue, update the draft to the newly approved commit if necessary, and run the workflow again with that SHA.
+The workflow checks the release target again before publishing. An existing tag must point to the tested commit. A rerun of an already published release with the same commit performs no publication. If a check fails, rerun after correcting the failure. If source changes are needed, approve a new version and commit; existing tags are never moved.
 
 ## Documentation deployment
 

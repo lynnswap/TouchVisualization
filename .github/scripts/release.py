@@ -24,15 +24,19 @@ def tag_commit(repository, tag):
     return target["sha"]
 
 
-def validate(repository, release, tag, commit):
+def validate(repository, release, tag, commit, *, allow_missing_tag=False):
     if release["tag_name"] != tag:
         raise ValueError("The Draft Release tag changed after preparation.")
     actual_commit = tag_commit(repository, tag)
+    existing_tag = actual_commit
     if actual_commit is None:
+        if not allow_missing_tag:
+            raise ValueError(f"Tag {tag} is missing; rerun release preparation.")
         ref = quote(release["target_commitish"], safe="")
         actual_commit = gh("api", f"repos/{repository}/commits/{ref}")["sha"]
     if actual_commit != commit:
         raise ValueError(f"Release target {actual_commit} differs from approved commit {commit}.")
+    return existing_tag
 
 
 def run(mode, repository, tag, commit, release_id=None):
@@ -44,9 +48,18 @@ def run(mode, repository, tag, commit, release_id=None):
         metadata = gh("release", "view", "--repo", repository, "--json", "databaseId", "--", tag)
         release_id = metadata["databaseId"]
     release = gh("api", f"repos/{repository}/releases/{release_id}")
-    validate(repository, release, tag, commit)
+    existing_tag = validate(repository, release, tag, commit, allow_missing_tag=mode == "prepare")
 
     if mode == "prepare":
+        if existing_tag is None:
+            try:
+                gh("api", "--method", "POST", f"repos/{repository}/git/refs",
+                   "--raw-field", f"ref=refs/tags/{tag}", "--raw-field", f"sha={commit}")
+            except subprocess.CalledProcessError:
+                # A concurrent preparation may already have created the same tag.
+                if tag_commit(repository, tag) != commit:
+                    raise
+            validate(repository, release, tag, commit)
         with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
             output.write(f"commit={commit}\nrelease_id={release['id']}\ndraft={str(release['draft']).lower()}\n")
     elif release["draft"]:
