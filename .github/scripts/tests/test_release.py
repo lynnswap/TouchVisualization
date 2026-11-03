@@ -12,6 +12,7 @@ spec.loader.exec_module(release)
 
 SHA = "a" * 40
 OTHER_SHA = "b" * 40
+TAG = {"ref": "refs/tags/v1.0.0", "object": {"type": "commit", "sha": SHA}}
 DRAFT = {
     "id": 1,
     "tag_name": "v1.0.0",
@@ -26,10 +27,23 @@ class ReleaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "output"
             with patch.dict(os.environ, {"GITHUB_OUTPUT": str(output)}):
-                with patch.object(release, "gh", side_effect=[{"databaseId": 1}, DRAFT, [], {"sha": SHA}]) as gh:
+                with patch.object(release, "gh", side_effect=[{"databaseId": 1}, DRAFT, [], {"sha": SHA}, {}, [TAG]]) as gh:
                     release.run("prepare", "example/package", "v1.0.0", SHA)
             self.assertEqual(output.read_text(), f"commit={SHA}\nrelease_id=1\ndraft=true\n")
             self.assertFalse(any("PATCH" in call.args for call in gh.call_args_list))
+            self.assertIn("POST", gh.call_args_list[4].args)
+
+    def test_preparation_reuses_matching_tag(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"GITHUB_OUTPUT": str(Path(directory) / "out")}):
+            with patch.object(release, "gh", side_effect=[{"databaseId": 1}, DRAFT, [TAG]]) as gh:
+                release.run("prepare", "example/package", "v1.0.0", SHA)
+            self.assertEqual(gh.call_count, 3)
+
+    def test_conflicting_target_prevents_tag_creation(self):
+        with patch.object(release, "gh", side_effect=[{"databaseId": 1}, DRAFT, [], {"sha": OTHER_SHA}]) as gh:
+            with self.assertRaisesRegex(ValueError, "differs from approved commit"):
+                release.run("prepare", "example/package", "v1.0.0", SHA)
+            self.assertFalse(any("POST" in call.args for call in gh.call_args_list))
 
     def test_a_moved_tag_prevents_publication(self):
         ref = {"ref": "refs/tags/v1.0.0", "object": {"type": "commit", "sha": OTHER_SHA}}
@@ -38,15 +52,15 @@ class ReleaseTests(unittest.TestCase):
                 release.run("publish", "example/package", "v1.0.0", SHA, "1")
             self.assertEqual(gh.call_count, 2)
 
-    def test_a_changed_draft_target_prevents_publication(self):
-        with patch.object(release, "gh", side_effect=[DRAFT, [], {"sha": OTHER_SHA}]) as gh:
-            with self.assertRaisesRegex(ValueError, "differs from approved commit"):
+    def test_missing_tag_prevents_publication(self):
+        with patch.object(release, "gh", side_effect=[DRAFT, []]) as gh:
+            with self.assertRaisesRegex(ValueError, "Tag .* is missing"):
                 release.run("publish", "example/package", "v1.0.0", SHA, "1")
-            self.assertEqual(gh.call_count, 3)
+            self.assertEqual(gh.call_count, 2)
 
     def test_publication_preserves_release_content(self):
         published = DRAFT | {"draft": False}
-        with patch.object(release, "gh", side_effect=[DRAFT, [], {"sha": SHA}, published]) as gh:
+        with patch.object(release, "gh", side_effect=[DRAFT, [TAG], published]) as gh:
             release.run("publish", "example/package", "v1.0.0", SHA, "1")
             self.assertEqual(gh.call_args.args, (
                 "api", "--method", "PATCH", "repos/example/package/releases/1",
