@@ -4,19 +4,22 @@ Display touch indicators across UIKit and SwiftUI screens for demos, presentatio
 
 ## Requirements
 
-- iOS 17+
+- Apps targeting iOS 16 or later
+- iOS 17 or later to display touch indicators
 - Xcode on macOS with Swift 6.3+
 
 ## Quick start
 
-Add [TouchVisualization](https://github.com/lynnswap/TouchVisualization) as a Swift package dependency and link the `TouchVisualization` library to your app target. Access the shared visualizer on the main actor.
+Add [TouchVisualization](https://github.com/lynnswap/TouchVisualization) as a Swift package dependency and link the `TouchVisualization` library to your app target. Access the shared visualizer on the main actor. In apps that support iOS 16, guard API calls with `if #available(iOS 17, *)`.
 
 ### Show touch indicators
 
 ```swift
 import TouchVisualization
 
-TouchVisualizer.shared.isEnabled = true
+if #available(iOS 17, *) {
+    TouchVisualizer.shared.isEnabled = true
+}
 ```
 
 Indicators follow touches across all windows without intercepting input. No view, scene, or window registration is required. Visualization starts disabled; set `isEnabled` to `false` to remove all indicators immediately.
@@ -24,12 +27,14 @@ Indicators follow touches across all windows without intercepting input. No view
 ### Customize the appearance
 
 ```swift
-TouchVisualizer.shared.configuration = .init(
-    strokeColor: .systemOrange,
-    fillColor: .systemYellow.withAlphaComponent(0.3),
-    strokeWidth: 2,
-    diameter: 48
-)
+if #available(iOS 17, *) {
+    TouchVisualizer.shared.configuration = .init(
+        strokeColor: .systemOrange,
+        fillColor: .systemYellow.withAlphaComponent(0.3),
+        strokeWidth: 2,
+        diameter: 48
+    )
+}
 ```
 
 Stroke and fill colors, including their opacity, are independent. Changes apply immediately to current and future indicators. Assign `TouchVisualizer.Configuration()` to restore the default appearance.

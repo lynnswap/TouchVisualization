@@ -6,10 +6,14 @@ Display touch indicators throughout an iOS app.
 
 Use ``TouchVisualizer/shared`` on the main actor to enable touch indicators across UIKit and SwiftUI screens. No view, scene, or window registration is required.
 
+The package can be linked by apps targeting iOS 16 or later. Its visualization APIs require iOS 17 or later; apps that support iOS 16 must guard their calls with `if #available(iOS 17, *)`.
+
 ```swift
 import TouchVisualization
 
-TouchVisualizer.shared.isEnabled = true
+if #available(iOS 17, *) {
+    TouchVisualizer.shared.isEnabled = true
+}
 ```
 
 Visualization starts disabled. Set `isEnabled` to `false` to remove all indicators immediately. Settings are not persisted, and the API is available in every build configuration.
@@ -23,12 +27,14 @@ Indicators follow individual touches without intercepting input or participating
 Set ``TouchVisualizer/configuration`` to change the outline color, fill color, outline width, or circle diameter. The two colors and their opacities are independent. By default, both use system blue, with the fill at 50% opacity.
 
 ```swift
-TouchVisualizer.shared.configuration = .init(
-    strokeColor: .systemOrange,
-    fillColor: .systemYellow.withAlphaComponent(0.3),
-    strokeWidth: 2,
-    diameter: 48
-)
+if #available(iOS 17, *) {
+    TouchVisualizer.shared.configuration = .init(
+        strokeColor: .systemOrange,
+        fillColor: .systemYellow.withAlphaComponent(0.3),
+        strokeWidth: 2,
+        diameter: 48
+    )
+}
 ```
 
 Configuration changes apply immediately to visible indicators, including those fading out, and to future touches. Updating the configuration preserves each indicator's position and does not change whether visualization is enabled. You can also modify a single property, such as `TouchVisualizer.shared.configuration.strokeColor = .systemRed`.

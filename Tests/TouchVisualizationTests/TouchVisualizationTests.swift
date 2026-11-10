@@ -11,6 +11,7 @@ import UIKit
 @MainActor
 struct TouchVisualizationTests {
     @Test
+    @available(iOS 17, *)
     func visualizerSettingsAreObservable() async {
         @Bindable var visualizer = TouchVisualizer.shared
         let originalIsEnabled = visualizer.isEnabled
@@ -53,6 +54,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func movingATouchReusesItsIndicator() throws {
         let overlay = TouchOverlayView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let touch = ObjectIdentifier(NSObject.self)
@@ -68,6 +70,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func simultaneousTouchesHaveIndependentPositions() throws {
         let overlay = TouchOverlayView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let firstTouch = ObjectIdentifier(NSObject.self)
@@ -83,6 +86,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func configurationUpdatesCurrentAndFutureIndicators() throws {
         let overlay = TouchOverlayView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let position = CGPoint(x: 40, y: 60)
@@ -121,6 +125,7 @@ struct TouchVisualizationTests {
     }
 
     @Test(arguments: [UIUserInterfaceStyle.light, .dark])
+    @available(iOS 17, *)
     func dynamicColorsUseTheOverlayTraits(style: UIUserInterfaceStyle) throws {
         let strokeColor = UIColor { traits in
             traits.userInterfaceStyle == .dark ? .white : .black
@@ -147,6 +152,7 @@ struct TouchVisualizationTests {
     }
 
     @Test(arguments: [UITouch.Phase.ended, .cancelled])
+    @available(iOS 17, *)
     func endingATouchFadesItsIndicator(phase: UITouch.Phase) throws {
         try withEnabledVisualizer { visualizer in
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
@@ -164,6 +170,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func nextEventRemovesMissingTouchesAndPreservesStationaryTouches() throws {
         try withEnabledVisualizer { visualizer in
             let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
@@ -194,6 +201,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func emptyTouchSetClearsOnlyItsWindowAndOtherEventTypesDoNotClearTouches() throws {
         try withEnabledVisualizer { visualizer in
             let firstWindow = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
@@ -219,6 +227,7 @@ struct TouchVisualizationTests {
         }
     }
 
+    @available(iOS 17, *)
     private func withEnabledVisualizer(_ body: (TouchVisualizer) throws -> Void) rethrows {
         let visualizer = TouchVisualizer.shared
         let wasEnabled = visualizer.isEnabled
@@ -231,6 +240,7 @@ struct TouchVisualizationTests {
     }
 
     @Test
+    @available(iOS 17, *)
     func indicatorsDoNotInterceptTouches() {
         let overlay = TouchOverlayView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let position = CGPoint(x: 40, y: 60)

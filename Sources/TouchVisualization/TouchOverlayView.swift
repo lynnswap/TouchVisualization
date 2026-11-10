@@ -3,6 +3,7 @@
 
 import UIKit
 
+@available(iOS 17, *)
 final class TouchOverlayView: UIView {
     var configuration: TouchVisualizer.Configuration {
         didSet {

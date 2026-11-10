@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "TouchVisualization",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v16)],
     products: [
         .library(name: "TouchVisualization", targets: ["TouchVisualization"])
     ],
