@@ -3,6 +3,7 @@
 
 import UIKit
 
+@available(iOS 17, *)
 extension TouchVisualizer {
     /// The appearance of touch indicators throughout the application.
     public struct Configuration: Equatable {

@@ -8,6 +8,7 @@ import UIKit
 ///
 /// Configure the shared instance on the main actor. Changes to its settings
 /// are observable. Settings are not persisted.
+@available(iOS 17, *)
 @MainActor
 @Observable
 public final class TouchVisualizer {

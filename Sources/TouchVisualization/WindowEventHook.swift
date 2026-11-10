@@ -4,6 +4,7 @@
 import ObjectiveC
 import UIKit
 
+@available(iOS 17, *)
 @MainActor
 enum WindowEventHook {
     static func install() {
@@ -26,6 +27,7 @@ enum WindowEventHook {
     }()
 }
 
+@available(iOS 17, *)
 extension UIWindow {
     @objc dynamic fileprivate func touchVisualization_sendEvent(_ event: UIEvent) {
         // Observe the event before dispatch invokes application code.
