@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      test-ios-16:
+        description: Install iOS 16.4 and test Objective-C class enumeration
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       ref:
@@ -20,6 +25,37 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  ios-16-compatibility:
+    name: Test class enumeration on iOS 16.4
+    if: github.event_name == 'workflow_dispatch' && inputs.test-ios-16
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install and boot iOS 16.4
+        run: |
+          xcodebuild -version
+          xcodebuild -downloadPlatform iOS -buildVersion 16.4
+          udid=$(xcrun simctl create "iOS 16 compatibility" com.apple.CoreSimulator.SimDeviceType.iPhone-14 com.apple.CoreSimulator.SimRuntime.iOS-16-4)
+          echo "SIMULATOR_UDID=$udid" >> "$GITHUB_ENV"
+          xcrun simctl bootstatus "$udid" -b
+
+      - name: Run the class enumeration regression test
+        run: |
+          xcodebuild test \
+            -workspace TouchVisualization.xcworkspace \
+            -scheme TouchVisualizationTests \
+            -testPlan TouchVisualizationTests \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -parallel-testing-enabled NO \
+            -only-testing:TouchVisualizationTests/TouchVisualizationTests/enumeratingClassesDoesNotRequireObservation \
+            CODE_SIGNING_ALLOWED=NO
+
   script-tests:
     name: Workflow script tests
     runs-on: ubuntu-24.04
