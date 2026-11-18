@@ -11,6 +11,14 @@ import UIKit
 @MainActor
 struct TouchVisualizationTests {
     @Test
+    func enumeratingClassesDoesNotRequireObservation() {
+        var count: UInt32 = 0
+        let classes = objc_copyClassList(&count)
+        defer { free(UnsafeMutableRawPointer(classes)) }
+        #expect(count > 0)
+    }
+
+    @Test
     @available(iOS 17, *)
     func visualizerSettingsAreObservable() async {
         @Bindable var visualizer = TouchVisualizer.shared
