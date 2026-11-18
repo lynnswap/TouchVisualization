@@ -53,7 +53,7 @@ jobs:
             -testPlan TouchVisualizationTests \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
             -parallel-testing-enabled NO \
-            -only-testing:TouchVisualizationTests/TouchVisualizationTests/enumeratingClassesDoesNotRequireObservation \
+            '-only-testing:TouchVisualizationTests/TouchVisualizationTests/enumeratingClassesDoesNotRequireObservation()' \
             CODE_SIGNING_ALLOWED=NO
 
   script-tests:
