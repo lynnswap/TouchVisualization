@@ -10,20 +10,26 @@ import UIKit
 /// are observable. Settings are not persisted.
 @available(iOS 17, *)
 @MainActor
-@Observable
-public final class TouchVisualizer {
+public final class TouchVisualizer: Observable {
     /// The application's touch visualizer.
     public static let shared = TouchVisualizer()
 
     /// Whether touches are visible throughout the application. Defaults to false.
     ///
     /// Disabling visualization immediately removes all indicators.
-    public var isEnabled = false {
-        didSet {
-            if isEnabled {
-                WindowEventHook.install()
-            } else {
-                removeIndicators()
+    public var isEnabled: Bool {
+        get {
+            Self.registrar.access(self, keyPath: \.isEnabled)
+            return enabled
+        }
+        set {
+            Self.registrar.withMutation(of: self, keyPath: \.isEnabled) {
+                enabled = newValue
+                if newValue {
+                    WindowEventHook.install()
+                } else {
+                    removeIndicators()
+                }
             }
         }
     }
@@ -32,15 +38,27 @@ public final class TouchVisualizer {
     ///
     /// Changing the configuration updates visible indicators immediately, without
     /// changing `isEnabled`. The visualizer does not persist the configuration.
-    public var configuration = Configuration() {
-        didSet {
-            let iterator = overlays.objectEnumerator()
-            while let overlay = iterator?.nextObject() as? TouchOverlayView {
-                overlay.configuration = configuration
+    public var configuration: Configuration {
+        get {
+            Self.registrar.access(self, keyPath: \.configuration)
+            return currentConfiguration
+        }
+        set {
+            Self.registrar.withMutation(of: self, keyPath: \.configuration) {
+                currentConfiguration = newValue
+                let iterator = overlays.objectEnumerator()
+                while let overlay = iterator?.nextObject() as? TouchOverlayView {
+                    overlay.configuration = newValue
+                }
             }
         }
     }
 
+    // iOS 16 can realize this class while enumerating Objective-C classes.
+    // Keep ObservationRegistrar out of its instance layout until the singleton is used.
+    private static let registrar = ObservationRegistrar()
+    private var enabled = false
+    private var currentConfiguration = Configuration()
     private let overlays = NSMapTable<UIWindow, TouchOverlayView>.weakToStrongObjects()
 
     private init() {
